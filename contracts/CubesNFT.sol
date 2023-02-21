@@ -58,6 +58,7 @@ contract CubesNFT is ERC721A, Ownable {
             "Insufficient price to purchase"
         );
         _safeMint(_msgSender(), quantity);
+        payable(owner()).transfer(msg.value);
     }
 
     function _baseURI() internal view override returns (string memory) {
