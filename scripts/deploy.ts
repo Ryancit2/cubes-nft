@@ -1,23 +1,28 @@
-import { ethers } from "hardhat";
+import { ethers } from "hardhat"
+import { MerkleTree } from "merkletreejs"
+import keccak256 from "keccak256"
+
+function presetMerkleTree(presetAccounts: string[]) {
+  const leafNodes = presetAccounts.map(acc => keccak256(acc))
+  const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
+  return merkleTree
+}
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const [owner, otherAccount, otherAccount2, otherAccount3] = await ethers.getSigners()
+  const tree = presetMerkleTree([owner.address, otherAccount.address, otherAccount2.address])
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const CubesNFT = await ethers.getContractFactory("CubesNFT")
+  const cubesNFT = await CubesNFT.deploy(tree.getHexRoot(), "ipfs://")
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  await cubesNFT.deployed()
 
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  console.log(`CubesNFT with whitelisted root ${tree.getHexRoot()} deployed to ${cubesNFT.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})
