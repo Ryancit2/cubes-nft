@@ -13,7 +13,7 @@ async function main() {
   const tree = presetMerkleTree([owner.address, otherAccount.address, otherAccount2.address])
 
   const CubesNFT = await ethers.getContractFactory("CubesNFT")
-  const cubesNFT = await CubesNFT.deploy(tree.getHexRoot(), "ipfs://")
+  const cubesNFT = await CubesNFT.deploy("ipfs://")
 
   await cubesNFT.deployed()
 
