@@ -35,6 +35,7 @@ contract CubesNFT is ERC721A, Ownable {
                 !presaleClaimed[_msgSender()],
                 "Presale already claimed!"
             );
+            require(totalSupply() < 1000, "Free mint limit reached");
             presaleClaimed[_msgSender()] = true;
             unitPrice = 0;
         }

@@ -58,6 +58,13 @@ describe("CubesNFT", function () {
       await expect(cubesNFT.connect(otherAccount3).mint(1)).to.be.revertedWith('Presale already claimed!')
     })
 
+    it("Should not allow more than 1000 mints in presale", async function () {
+      const { cubesNFT, otherAccount3 } = await loadFixture(deployCubesNFTFixture)
+
+      await cubesNFT.connect(otherAccount3).mint(1000)
+      await expect(cubesNFT.connect(otherAccount3).mint(1)).to.be.revertedWith('Free mint limit reached')
+    })
+
     it("Should allow presale mint for free", async function () {
       const { cubesNFT, owner } = await loadFixture(deployCubesNFTFixture)
 
